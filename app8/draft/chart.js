@@ -2,7 +2,7 @@ async function drawLineChart() {
   // write your code here
   const dataset = await d3.json("my_weather_data.json")
 
-  const yAccessor = d => d.temperatureMax
+  const yAccessor = d => d.warningMax
   const dateParser = d3.timeParse("%Y-%m-%d")
   const xAccessor = d => dateParser(d.date)
 
@@ -35,15 +35,6 @@ async function drawLineChart() {
     .domain(d3.extent(dataset, yAccessor))
     .range([dimensions.boundedHeight, 0])
 
-  const freezingTempraturePlacement = yScale(32)
-
-  const freezingTemperatures = bounds.append("rect")
-    .attr("x", 0)
-    .attr("width", dimensions.boundedWidth)
-    .attr("y", freezingTempraturePlacement)
-    .attr("height", dimensions.boundedHeight - freezingTempraturePlacement)
-    .attr("fill", "#e0f3f3")
-
   const xScale = d3.scaleTime()
     .domain(d3.extent(dataset, xAccessor))
     .range([0, dimensions.boundedWidth])
@@ -52,11 +43,28 @@ async function drawLineChart() {
     .x(d => xScale(xAccessor(d)))
     .y(d => yScale(yAccessor(d)))
 
-  const line = bounds.append("path")
+  const path = bounds.append("path")
     .attr("d", lineGenerator(dataset))
     .attr("fill", "none")
-    .attr("stroke", "#af9358")
-    .attr("stroke-width", 2)
+    .attr("stroke", "#6c5ce7")
+    .attr("stroke-width", 3)
+
+  // create transition option
+  const transitionOption = d3.transition()
+    .transition()
+    .ease(d3.easeSin)
+    .duration(4000);
+
+  // getting total length of svg path
+  const pathLength = path.node().getTotalLength();
+
+  path.attr("stroke-dashoffset", pathLength)
+    .attr("stroke-dasharray", pathLength);
+
+  path.attr("stroke-dashoffset", pathLength)
+    .attr("stroke-dasharray", pathLength)
+    .transition(transitionOption)
+    .attr("stroke-dashoffset", 0);
 
   const yAxisGenerator = d3.axisLeft()
     .scale(yScale)
@@ -70,6 +78,14 @@ async function drawLineChart() {
   const xAxis = bounds.append("g")
     .call(xAxisGenerator)
     .style("transform", `translateY(${dimensions.boundedHeight}px)`)
+
+  bounds.append("g")
+    .append("text")
+    .attr("x", dimensions.margin.left + 50)
+    .style("text-anchor", "middle")
+    .style("font-size", "18px")
+    .style("font-weight", "bold")
+    .text("Warning frequency")
 
 }
 drawLineChart()
