@@ -7,8 +7,8 @@ async function drawLineChart() {
   const xAccessor = d => dateParser(d.date)
 
   let dimensions = {
-    width: window.innerWidth * 0.9,
-    height: 400,
+    width: 900,
+    height: 350,
     margin: {
       top: 15,
       right: 15,
@@ -47,7 +47,7 @@ async function drawLineChart() {
     .attr("d", lineGenerator(dataset))
     .attr("fill", "none")
     .attr("stroke", "#6c5ce7")
-    .attr("stroke-width", 3)
+    .attr("stroke-width", 2)
 
   // create transition option
   const transitionOption = d3.transition()
